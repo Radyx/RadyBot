@@ -140,4 +140,5 @@ client.on('message', message => {
 client.on("guildMemberAdd" ,(member) => {
     queue_await_member.push(member.user.id);
 });
+
 client.login(process.env.BOT_TOKEN);
