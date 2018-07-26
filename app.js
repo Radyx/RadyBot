@@ -80,11 +80,10 @@ function await_new_mb(){
     }else{
         if (my_guild != null){
             my_guild.members.forEach(function (memb) {
-                if (memb.roles.size === 1 && queue_await_member.indexOf(memb.user.id) === -1){
+                if (memb.roles.size === 1){
                     queue_await_member.push(memb.user.id);
                 }
-            });
-             
+            }); 
         }
         setTimeout(function(){
             await_new_mb();
@@ -96,7 +95,7 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     my_guild = client.guilds.find("id", "471736146473517057");
     verified_role = my_guild.roles.find("name", "Verified");
-    awaiting_role = my_guild.roles.find("name", "Awaiting");
+    awaiting_role = my_guild.roles.find("name", "Waiting");
     await_new_mb();
 });
 
@@ -125,6 +124,7 @@ client.on('message', message => {
             // Wrong Password
             try{
                 message.member.kick("Wrong Password!");
+                await_new_mb();
             }catch(ex){
                 console.log(ex);
             }
