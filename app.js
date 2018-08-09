@@ -16,6 +16,9 @@ var awaiting_role;
 var my_guild_id = process.env.GUILD_ID;
 var my_guild;
 
+client.prefix = "rady";
+client.color = [0, 174, 219];
+
 var has_been_verified = [];
 // Encrypt Function
 function EncryptMD5(str){
@@ -59,6 +62,20 @@ function queue_front(){
 }
 function queue_is_empty(){
     return (queue_await_member.length === 0);
+}
+function find_member_by_name(user_name){
+    var to_return;
+    my_guild.members.forEach(function (memb) {
+        if (memb.user.username.toLowerCase().startsWith(user_name)){
+            to_return = memb.user;
+        }
+        if (memb.nickname != undefined){
+            if (memb.nickname.toLowerCase().startsWith(user_name)){
+                to_return = memb.user;
+            }
+        }
+    });
+    return to_return;
 }
 function await_new_mb(){
     if (!queue_is_empty()){
@@ -129,10 +146,39 @@ client.on('message', message => {
                 console.log(ex);
             }
         }
-    try{
-        message.delete();
-    }catch(ex){
-        console.log(ex);
+        try{
+            message.delete();
+        }catch(ex){
+            console.log(ex);
+        }
+    }
+    // Ignore if it doesn't start with bot prefix
+    if (!message.content.startsWith(client.prefix)) return;
+    var msg = message.content.split(/\s+/g);
+    if (msg.length > 1){
+        cmd = msg[1].toLowerCase();
+    }
+    // Run commands
+    if (cmd === "avatar"){
+        var correct_user = message.author;
+        var member = message.mentions.members.first();
+        if (member){
+            correct_user = member.user;
+        }else if (msg.length === 2){
+            correct_user = message.author;
+        }else{
+            var this_username = message.content.substring((client.prefix + " avatar ").length, message.content.length).toLowerCase();
+            correct_user = find_member_by_name(this_username);
+        }
+        if (correct_user){
+            const embed = new Discord.RichEmbed()
+                .setTitle("Download Image!")
+                .setDescription(correct_user.tag)
+                .setURL(correct_user.avatarURL)
+                .setColor(client.color)
+                .setImage(correct_user.avatarURL);
+            message.channel.send({embed});
+        }
     }
   }
 });
