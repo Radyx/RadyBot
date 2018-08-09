@@ -180,7 +180,6 @@ client.on('message', message => {
             message.channel.send({embed});
         }
     }
-  }
 });
 
 client.on("guildMemberAdd" ,(member) => {
