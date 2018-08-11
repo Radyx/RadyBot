@@ -243,7 +243,7 @@ client.on('message', message => {
         }
     }
     // Ignore if it doesn't start with bot prefix
-    if (!message.content.startsWith(client.prefix)) return;
+    if (!message.content.toLowerCase().startsWith(client.prefix)) return;
     var msg = message.content.split(/\s+/g);
     var args = [];
     if (msg.length > 1){
