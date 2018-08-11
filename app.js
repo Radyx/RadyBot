@@ -184,7 +184,17 @@ function find_user_change_db(message, channel, edited_message){
         console.log(ex.toString());
     }
 }
-
+function user_condition(memb, username){
+    if (memb.user.username.toLowerCase().startsWith(username)){
+        return true;
+    }
+    if (memb.nickname != undefined){
+        if (memb.nickname.toLowerCase().startsWith(username)){
+            return true;
+        }
+    }
+    return false;
+}
 // Bot Events
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -248,14 +258,22 @@ client.on('message', message => {
     // Run commands
     if (cmd === "avatar"){
         var correct_user = message.author;
-        var member = message.mentions.members.first();
-        if (member){
+        var member;
+        try{
+            member = message.mentions.members.first();
+        }catch(exx){
+            
+        }
+        if (member != null){
             correct_user = member.user;
-        }else if (msg.length === 2){
+        }else if (args.length === 0){
             correct_user = message.author;
         }else{
             var this_username = message.content.substring((client.prefix + " avatar ").length, message.content.length).toLowerCase();
-            correct_user = find_member_by_name(this_username);
+            var found_members = message.guild.members.filter(x => user_condition(x, this_username));
+            if (found_members.array().length > 0){
+                correct_user = found_members.array()[0].user;
+            }
         }
         if (correct_user){
             const embed = new Discord.RichEmbed()
