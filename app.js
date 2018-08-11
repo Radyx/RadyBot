@@ -2,7 +2,6 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const CryptoJS = require("crypto-js");
-const request = require('request');
 
 // Default Variables
 var awaiting_channel = "471830779354284033";
@@ -118,42 +117,6 @@ function await_new_mb(){
             await_new_mb();
         }, 1000);
     }
-}
-function clear_channel2(channel){
-    channel.fetchMessages().then(messages => {
-        var messagesDeleted = messages.array().length;
-        if (messagesDeleted > 0){
-            messages.forEach(function(msg){
-                msg.delete();
-            });
-            clear_channel2(channel);
-        }else{
-            channel.send(`:white_check_mark: This channel has been erased (\`${erased}\` deleted messages).`).then(msg => {
-                msg.delete(4000);
-            });
-        }
-    });
-}
-function clear_channel(channel){
-    channel.fetchMessages().then(messages => {
-        var messagesDeleted = messages.array().length;
-        try{
-            if (messagesDeleted > 0){
-                channel.bulkDelete(100).then(() => {
-                    if (messagesDeleted > 0){
-                        erased += messagesDeleted;
-                        clear_channel(channel);
-                    }
-                }).catch(()=>clear_channel2(channel));
-            }else{
-                channel.send(`:white_check_mark: This channel has been erased (\`${erased}\` deleted messages).`).then(msg => {
-                    msg.delete(4000);
-                });
-            }
-        }catch(ex){
-            
-        }
-    });
 }
 function find_role_by_name(role_name){
     var to_return;
@@ -325,12 +288,6 @@ client.on('message', message => {
                 }
                 message.member.addRole(color_role);
             }
-        }
-    }
-    if (cmd === "erase"){
-        if (message.author.id === owner_id){
-            erased = 0;
-            clear_channel(message.channel);
         }
     }
     if (cmd === "save"){
