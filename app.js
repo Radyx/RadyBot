@@ -150,7 +150,13 @@ function find_user_load_db(message, channel){
             for (var i = 0;i < mm.length; i++){
                 if (mm[i].startsWith(userid)){
                     to_return = mm[i].substring(userid.length + 1, mm[i].length);
-                    message.channel.send(to_return);
+                    const embed = new Discord.RichEmbed()
+                        .setTitle(`${message.author.username}'s profile`)
+                        .setColor(client.color)
+
+                        .setThumbnail(message.author.avatarURL)
+                        .addField("Description", to_return);
+                    message.channel.send({embed});
                 }
             }
         })
@@ -290,11 +296,11 @@ client.on('message', message => {
             }
         }
     }
-    if (cmd === "save"){
-        var to_save = message.content.substring((client.prefix + " save ").length, message.content.length);
+    if (cmd === "setinfo"){
+        var to_save = message.content.substring((client.prefix + " setinfo ").length, message.content.length);
         find_user_change_db(message, user_info_channel, to_save);
     }
-    if (cmd === "load"){
+    if (cmd === "profile"){
         find_user_load_db(message, user_info_channel)
     }
 });
