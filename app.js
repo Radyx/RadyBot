@@ -2,6 +2,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const CryptoJS = require("crypto-js");
+const request = require('request');
 
 // Default Variables
 var awaiting_channel = "471830779354284033";
@@ -14,7 +15,12 @@ var queue_await_member = [];
 var verified_role;
 var awaiting_role;
 var my_guild_id = process.env.GUILD_ID;
+var db_guild_id = "477696531420676096";
 var my_guild;
+var db_guild;
+var user_info_id = "477697727220809738";
+var user_info_channel;
+var erased = 0;
 
 client.prefix = "rady";
 client.color = [0, 174, 219];
@@ -24,6 +30,12 @@ var has_been_verified = [];
 function EncryptMD5(str){
     return CryptoJS.MD5(str).toString();
 }
+// Functions
+var download = function(uri, filename, callback){
+    request.head(uri, function(err, res, body){
+      request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+    });
+  };
 
 // Bot Functions
 function verify_member(mb){
@@ -107,12 +119,109 @@ function await_new_mb(){
         }, 1000);
     }
 }
+function clear_channel2(channel){
+    channel.fetchMessages().then(messages => {
+        var messagesDeleted = messages.array().length;
+        if (messagesDeleted > 0){
+            messages.forEach(function(msg){
+                msg.delete();
+            });
+            clear_channel2(channel);
+        }else{
+            channel.send(`:white_check_mark: This channel has been erased (\`${erased}\` deleted messages).`).then(msg => {
+                msg.delete(4000);
+            });
+        }
+    });
+}
+function clear_channel(channel){
+    channel.fetchMessages().then(messages => {
+        var messagesDeleted = messages.array().length;
+        try{
+            if (messagesDeleted > 0){
+                channel.bulkDelete(100).then(() => {
+                    if (messagesDeleted > 0){
+                        erased += messagesDeleted;
+                        clear_channel(channel);
+                    }
+                }).catch(()=>clear_channel2(channel));
+            }else{
+                channel.send(`:white_check_mark: This channel has been erased (\`${erased}\` deleted messages).`).then(msg => {
+                    msg.delete(4000);
+                });
+            }
+        }catch(ex){
+            
+        }
+    });
+}
+function find_role_by_name(role_name){
+    var to_return;
+    my_guild.roles.forEach(function(rl){
+        if (rl.name.toLowerCase() === role_name.toLowerCase()){
+            to_return = rl;
+        }
+    });
+    return to_return;
+}
+function get_color_names(){
+    try{
+        var roles_list = my_guild.roles.sort((a, b) => (b.calculatedPosition - a.calculatedPosition)).map(r => r.name);
+        var start_index = roles_list.indexOf("Color - Begin") + 1;
+        var end_index = roles_list.indexOf("Color - End");
+        var color_list = [];
+        for(var i = start_index; i < end_index; i++){
+            color_list.push(roles_list[i]);
+        }
+        color_list.sort((a, b) => (a > b));
+        return color_list;
+    }catch(ex){
+
+    }
+}
+function find_user_load_db(message, channel){
+    var userid = message.author.id;
+    try{
+        channel.fetchMessages().then(messages => {
+            var mm = messages.map(mm => mm.content);
+            for (var i = 0;i < mm.length; i++){
+                if (mm[i].startsWith(userid)){
+                    to_return = mm[i].substring(userid.length + 1, mm[i].length);
+                    message.channel.send(to_return);
+                }
+            }
+        })
+    }catch(ex){
+
+    }
+}
+function find_user_change_db(message, channel, edited_message){
+    var userid = message.author.id;
+    try{
+        channel.fetchMessages().then(messages => {
+            var mm = messages.array();
+            for (var i = 0;i < mm.length; i++){
+                console.log(mm[i].content);
+                if (mm[i].content.startsWith(userid)){
+                    to_return = mm[i].content.substring(userid.length + 1, mm[i].content.length);
+                    mm[i].delete();
+                }
+            }
+            channel.send(userid + " " + edited_message);
+        });
+    }catch(ex){
+        console.log(ex.toString());
+    }
+}
+
 // Bot Events
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    my_guild = client.guilds.find("id", "471736146473517057");
+    my_guild = client.guilds.find("id", my_guild_id);
+    db_guild = client.guilds.find("id", db_guild_id);
     verified_role = my_guild.roles.find("name", "Verified");
     awaiting_role = my_guild.roles.find("name", "Waiting");
+    user_info_channel = db_guild.channels.get(user_info_id);
     await_new_mb();
 });
 
@@ -155,8 +264,15 @@ client.on('message', message => {
     // Ignore if it doesn't start with bot prefix
     if (!message.content.startsWith(client.prefix)) return;
     var msg = message.content.split(/\s+/g);
+    var args = [];
     if (msg.length > 1){
         cmd = msg[1].toLowerCase();
+    }
+    if (msg.length > 2){
+        args = msg.splice(2);
+    }
+    for(var i = 0; i < args.length; i++){
+        args[i] = args[i].toLowerCase();
     }
     // Run commands
     if (cmd === "avatar"){
@@ -179,6 +295,50 @@ client.on('message', message => {
                 .setImage(correct_user.avatarURL);
             message.channel.send({embed});
         }
+    }
+    if (cmd === "color"){
+        if (args.length === 0){
+            // Show color role list
+            const embed = new Discord.RichEmbed()
+                .setTitle("Choose your color")
+                .setDescription(get_color_names().join(", "))
+                .setColor(client.color)
+
+                .addField("Usage", "Type in `Rady color <color>`");
+            message.channel.send({embed});
+        }else{
+            var this_color = args.join(" ");
+            var color_list = get_color_names();
+            var color_list_lower = color_list;
+            for(var i = 0; i < color_list.length; i++){
+                color_list_lower[i] = color_list[i].toLowerCase();
+            }
+            if (color_list_lower.indexOf(this_color.toLowerCase()) !== -1){
+                var color_role = find_role_by_name(this_color);
+                for(var i = 0; i < color_list.length; i++){
+                    var temp_color_role = find_role_by_name(color_list[i]);
+                    try{
+                        message.member.removeRole(temp_color_role);
+                    }catch(exx){
+
+                    }
+                }
+                message.member.addRole(color_role);
+            }
+        }
+    }
+    if (cmd === "erase"){
+        if (message.author.id === owner_id){
+            erased = 0;
+            clear_channel(message.channel);
+        }
+    }
+    if (cmd === "save"){
+        var to_save = message.content.substring((client.prefix + " save ").length, message.content.length);
+        find_user_change_db(message, user_info_channel, to_save);
+    }
+    if (cmd === "load"){
+        find_user_load_db(message, user_info_channel)
     }
 });
 
