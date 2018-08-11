@@ -147,18 +147,20 @@ function find_user_load_db(message, channel){
     try{
         channel.fetchMessages().then(messages => {
             var mm = messages.map(mm => mm.content);
+            var desc = "none";
             for (var i = 0;i < mm.length; i++){
                 if (mm[i].startsWith(userid)){
                     to_return = mm[i].substring(userid.length + 1, mm[i].length);
-                    const embed = new Discord.RichEmbed()
-                        .setTitle(`${message.author.username}'s profile`)
-                        .setColor(client.color)
-
-                        .setThumbnail(message.author.avatarURL)
-                        .addField("Description", to_return);
-                    message.channel.send({embed});
+                    desc = to_return;
                 }
             }
+            const embed = new Discord.RichEmbed()
+                .setTitle(`${message.author.username}'s profile`)
+                .setColor(client.color)
+
+                .setThumbnail(message.author.avatarURL)
+                .addField("Description", desc);
+            message.channel.send({embed});
         })
     }catch(ex){
 
