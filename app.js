@@ -246,6 +246,7 @@ client.on('message', message => {
     if (!message.content.toLowerCase().startsWith(client.prefix)) return;
     var msg = message.content.split(/\s+/g);
     var args = [];
+    var cmd;
     if (msg.length > 1){
         cmd = msg[1].toLowerCase();
     }
