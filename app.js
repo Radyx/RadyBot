@@ -136,7 +136,7 @@ function get_color_names(){
         for(var i = start_index; i < end_index; i++){
             color_list.push(roles_list[i]);
         }
-        color_list.sort((a, b) => (a > b));
+        color_list.sort((a, b) => a.localeCompare(b));
         return color_list;
     }catch(ex){
 
