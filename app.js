@@ -97,10 +97,14 @@ function await_new_mb(){
         setTimeout(function(){
             try{
                 if (has_been_verified.indexOf(current_member) === -1){
-                    if (current_member.roles.has(awaiting_role)){
-                        member.kick();
-                    }
                     has_been_verified.splice(queue_await_member.indexOf(member.user.id), 1);
+                    try{
+                        if (current_member.roles.has(awaiting_role)){
+                            member.kick();
+                        }
+                    }catch(ex2){
+                        console.log(ex2);
+                    }
                     await_new_mb();
                 }
             }catch(ex){
