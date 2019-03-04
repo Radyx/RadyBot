@@ -292,15 +292,15 @@ client.on('message', message => {
             message.channel.send({embed});
         }
     }
-    if (cmd === "color"){
+    if (cmd === "cor"){
         if (args.length === 0){
             // Show color role list
             const embed = new Discord.RichEmbed()
-                .setTitle("Choose your color")
+                .setTitle("Escolha sua cor")
                 .setDescription(get_color_names(message.guild).join(", "))
                 .setColor(client.color)
 
-                .addField("Usage", "Type in `Rady color <color>`");
+                .addField("Uso", "Digite `Rady cor <cor>`");
             message.channel.send({embed});
         }else{
             var this_color = args.join(" ");
@@ -320,6 +320,7 @@ client.on('message', message => {
                     }
                 }
                 message.member.addRole(color_role);
+                message.reply(`cor {color_role} adicionada com sucesso!`);
             }
         }
     }
@@ -327,7 +328,7 @@ client.on('message', message => {
         var to_save = message.content.substring((client.prefix + " setinfo ").length, message.content.length);
         find_user_change_db(message, user_info_channel, to_save);
     }
-    if (cmd === "profile"){
+    if (cmd === "perfil"){
         find_user_load_db(message, user_info_channel)
     }
 });
