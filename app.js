@@ -304,7 +304,7 @@ client.on('message', message => {
             message.channel.send({embed});
         }else{
             var this_color = args.join(" ");
-            var color_list = get_color_names();
+            var color_list = get_color_names(message.guild);
             var color_list_lower = color_list;
             for(var i = 0; i < color_list.length; i++){
                 color_list_lower[i] = color_list[i].toLowerCase();
