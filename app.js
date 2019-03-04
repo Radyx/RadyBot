@@ -209,7 +209,7 @@ client.on('ready', () => {
     //verified_role = my_guild.roles.find("name", "Verified");
     //awaiting_role = my_guild.roles.find("name", "Waiting");
     user_info_channel = db_guild.channels.get(user_info_id);
-    await_new_mb();
+    //await_new_mb();
 });
 
 client.on('message', message => {
