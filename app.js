@@ -124,9 +124,9 @@ function await_new_mb(){
         }, 1000);
     }
 }
-function find_role_by_name(role_name){
+function find_role_by_name(role_name, t_guild){
     var to_return;
-    my_guild.roles.forEach(function(rl){
+    t_guild.roles.forEach(function(rl){
         if (rl.name.toLowerCase() === role_name.toLowerCase()){
             to_return = rl;
         }
@@ -310,9 +310,9 @@ client.on('message', message => {
                 color_list_lower[i] = color_list[i].toLowerCase();
             }
             if (color_list_lower.indexOf(this_color.toLowerCase()) !== -1){
-                var color_role = find_role_by_name(this_color);
+                var color_role = find_role_by_name(this_color, message.guild);
                 for(var i = 0; i < color_list.length; i++){
-                    var temp_color_role = find_role_by_name(color_list[i]);
+                    var temp_color_role = find_role_by_name(color_list[i], message.guild);
                     try{
                         message.member.removeRole(temp_color_role);
                     }catch(exx){
