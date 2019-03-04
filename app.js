@@ -133,9 +133,9 @@ function find_role_by_name(role_name){
     });
     return to_return;
 }
-function get_color_names(){
+function get_color_names(t_guild){
     try{
-        var roles_list = my_guild.roles.sort((a, b) => (b.calculatedPosition - a.calculatedPosition)).map(r => r.name);
+        var roles_list = t_guild.roles.sort((a, b) => (b.calculatedPosition - a.calculatedPosition)).map(r => r.name);
         var start_index = roles_list.indexOf("Color - Begin") + 1;
         var end_index = roles_list.indexOf("Color - End");
         var color_list = [];
@@ -297,7 +297,7 @@ client.on('message', message => {
             // Show color role list
             const embed = new Discord.RichEmbed()
                 .setTitle("Choose your color")
-                .setDescription(get_color_names().join(", "))
+                .setDescription(get_color_names(message.guild).join(", "))
                 .setColor(client.color)
 
                 .addField("Usage", "Type in `Rady color <color>`");
