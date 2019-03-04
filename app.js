@@ -320,7 +320,7 @@ client.on('message', message => {
                     }
                 }
                 message.member.addRole(color_role);
-                message.reply(`cor {color_role} adicionada com sucesso!`);
+                message.reply(`cor {color_role.name} adicionada com sucesso!`);
             }
         }
     }
