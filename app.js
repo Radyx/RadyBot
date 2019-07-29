@@ -205,10 +205,10 @@ function user_condition(memb, username){
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     //my_guild = client.guilds.find("id", my_guild_id);
-    db_guild = client.guilds.find("id", db_guild_id);
+    //db_guild = client.guilds.find("id", db_guild_id);
     //verified_role = my_guild.roles.find("name", "Verified");
     //awaiting_role = my_guild.roles.find("name", "Waiting");
-    user_info_channel = db_guild.channels.get(user_info_id);
+    //user_info_channel = db_guild.channels.get(user_info_id);
     //await_new_mb();
 });
 
