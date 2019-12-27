@@ -332,7 +332,7 @@ client.on('message', message => {
         find_user_load_db(message, user_info_channel)
     }
     if (cmd === "delete"){
-        if (message.author.id === owner.id){ // Test
+        if (message.author.id === owner_id){ // Test
             const fetchedChannel = message.guild.channels.find(r => r.name === args.join(' '));
             fetchedChannel.delete();
         }else{
