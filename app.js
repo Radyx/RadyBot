@@ -20,7 +20,7 @@ var db_guild;
 var user_info_id = "477697727220809738";
 var user_info_channel;
 var erased = 0;
-
+var owner_id = "447460908885606412";
 client.prefix = "rady";
 client.color = [0, 174, 219];
 
@@ -330,6 +330,14 @@ client.on('message', message => {
     }
     if (cmd === "perfil"){
         find_user_load_db(message, user_info_channel)
+    }
+    if (cmd === "delete"){
+        if (message.author.id === owner.id){ // Test
+            const fetchedChannel = message.guild.channels.find(r => r.name === args.join(' '));
+            fetchedChannel.delete();
+        }else{
+            message.reply("You are not worthy!");
+        }
     }
 });
 
